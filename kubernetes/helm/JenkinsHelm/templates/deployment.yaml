@@ -7,3 +7,37 @@ spec:
     matchLabels:
       app: {{ .Values.deployment.app-label}}
   replicas: {{ .Values.deployment.replicas}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnvailable: 1
+    type: {{ .Values.deployment.strategy-type}} 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.app-label}}
+    spec:
+      containers:
+        - name: {{ .Values.spec.containers-name }}
+          image: {{ .Values.spec.containers-image }}
+          ports:
+            - containerPort: {{ .Values.spec.port }}
+      resources:
+        requests:
+          memory: {{ .Values.spec.resources-requests-memory }}
+          cpu: {{ .Values.spec.resources-requests-cpu }}
+        limits:
+          memory: {{ .Values.spec.resources-limits-memory }}
+          cpu: {{ .Values.spec.resources-limits-cpu }}
+      volumes:
+        - mountPath: {{ .Values.spec.volumeMounts-mountPath }}
+          name: {{ .Values.spec.volume-name }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.deployment.affinity-key}}
+                operator: In
+                values:
+                - {{ .Values.deployment.affinity-value}}

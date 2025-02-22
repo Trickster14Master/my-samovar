@@ -7,12 +7,19 @@ deployment:
   affinity-value: true
 
 spec:
-  containers-name: test-deploy
-  containers-image: nnginx:alpine
+  containers-name: test-container
+  containers-image: nginx:alpine
   port: 80
   env:
     env-name: env-test-deploy
     env-values: balblabla
+
+  resources-requests-memory: "64Mi"
+  resources-requests-cpu: "250m"
+  resources-limits-memory: "128Mi"
+  resources-limits-cpu: "500m"
+
+  volume-name: test-volume
   volumeMounts-mountPath: /usr/share/nginx/html/
     
 
