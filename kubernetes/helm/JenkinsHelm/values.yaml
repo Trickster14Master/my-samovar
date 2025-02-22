@@ -1,0 +1,29 @@
+deployment:
+  deployment-name: test-deploy
+  app-label: test-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity-key: work
+  affinity-value: true
+
+spec:
+  containers-name: test-deploy
+  containers-image: nnginx:alpine
+  port: 80
+  env:
+    env-name: env-test-deploy
+    env-values: balblabla
+  volumeMounts-mountPath: /usr/share/nginx/html/
+    
+
+service:
+  service-name: test-svc
+  port: 80
+  target-port: 80
+  type: LoadBalancer
+
+persistentVolumeClaim:
+  persistent-volume-claim-name: test-pvc
+  storage-class: manual
+  access-modes: ReadWriteMany
+  size: 1Gi

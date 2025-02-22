@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx # имя сервиса
+spec:
+  selector:
+    app: nginx # метка подов 
+  ports:
+  - name: https
+    port: 80
+    targetPort: 80
+  - name: httpss
+    port: 443
+    targetPort: 443
+  type: LoadBalancer

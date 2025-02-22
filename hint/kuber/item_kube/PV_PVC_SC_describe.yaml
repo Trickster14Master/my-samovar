@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolume # тип 
+metadata:
+  name: mysqldb-pv-storage # имя 
+  labels: # лейбел
+    type: local
+spec:
+  storageClassName: manual
+  capacity: # доступный обьём 
+    storage: 5Gi
+  accessModes: # какие операции разрешены 
+    - ReadWriteOnce
+    # - ReadWriteOnce -- том может быть смонтирован в режиме чтения-записи одним узлом
+    # - ReadOnlyMany -- том может быть подключен только для чтения многими узлами
+    # - ReadWriteMany -- том может быть подключен для чтения и записи многими узлами
+  hostPath: # куда будут прокидываться данные на ноде 
+    path: "/mnt/k3s-data/mysql"
+---
+#NFS
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: test-nfs
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  nfs:
+    path: /var/k8s/logs/static-pv
+    server: 192.168.218.53
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim # тип 
+metadata:
+  name: mysqldb-pv-claim-storage # название 
+spec:
+  storageClassName: manual
+  volumeName: mysqldb-pv-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+

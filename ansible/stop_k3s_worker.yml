@@ -1,0 +1,7 @@
+- name: Delete worker
+  hosts: worker-node
+  become: yes
+
+  tasks:
+  - name: delete node node
+    command: sudo systemctl stop k3s-agent

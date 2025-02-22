@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector: # указываем какие теги будет мониторить диплой
+    matchLabels:
+      app: nginx
+  replicas: 1 # сколько подов запустить 
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnvailable: 1
+    type: RollingUpdate # указываем что наше приложение должно обнавляться плавно при изменении версии 
+  template: # указываем какие теги повесить на поды 
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+
+          livenessProbe: # проверяет живой ли под, и пытаеться его поднять в случаи смерти, Readiness Probes тоже самое, только он только проверяет, живой ли под, и если он не жив то он перестаёт перенаправлять трафик на него 
+            exec: # exec выполняет произзвольную команду внутри контейнера, по сути выполняет внутри контейнера команду и проверяет что возвращаеться   
+              command:
+              - cat
+              - /tmp/healthy
+
+            tcpSocket: # проверяет есть ли странгица по tcp
+              port: 8080
+
+            httpGet: # делает запрос по http 
+              path: /healthcheck
+              port: 8000
+
+            initialDelaySeconds: 5 # указываем через сколько выполнять команды после старта контейнера 
+            periodSeconds: 5  # через какой промежуток времени опять проводить проверку 
+            timeoutSeconds: 1 # сколько ожидать пробу 
+            successThreshold: 1 # минимальное число последовательных проверок.
+            failureThreshold: 3 # сколько раз провести проверку чтобы сщитать контейнер умершим 

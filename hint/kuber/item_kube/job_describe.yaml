@@ -1,0 +1,15 @@
+# Job под который выполнит определённые действия и прекратит своё сущестование 
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-with-restartpolicy-onfailure
+spec:
+  backoffLimit: 3 # сколько раз будет осуществлён рестарт 
+  template:
+    spec:
+      containers:
+      - name: job-with-failure
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["echo 'Running Job'; sleep 5; exit 1"] # комманда 
+      restartPolicy: OnFailure # при феле будет пеоесозданна джоба 

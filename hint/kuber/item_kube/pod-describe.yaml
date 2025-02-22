@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-app
+  labels: # метки
+    environmens: dev
+    app: http-serv
+spec: # характеристики контейнера
+  nodeSelector: # указываем ноду на которой запуститься поду 
+    longhorn: trye
+  containers:
+  - name: test-app # имя контейнера 
+    image: jellyfin/jellyfin
+    ports: # прокидываем сразу несколько протов
+    - name: http
+      containerPort: 80
+    - name: https
+      containerPort: 443
+

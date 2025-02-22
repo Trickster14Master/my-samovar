@@ -1,0 +1,36 @@
+- name: setap k8s
+  hosts: k8s-worker-node
+  become: yes
+  vars:
+    pakages1:
+            - nfs-common
+
+  tasks:
+  - name: updete
+    apt:
+      update_cache: true
+      cache_valid_time: 3600
+      force_apt_get: true
+
+  - name: Install pekeg
+    apt:
+      pkg: "{{pakages1}}"
+      state: present
+
+  - name: stop multipathd
+    service:
+      name:  multipathd
+      state: stopped
+
+  - name: Add iscsi_tcp
+    command: modprobe iscsi_tcp
+
+  - name: enable iscsid
+    systemd:
+      name: iscsid
+      enabled: true
+
+  - name: start iscsid
+    systemd:
+      name: iscsid
+      state: started

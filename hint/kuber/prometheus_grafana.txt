@@ -1,0 +1,22 @@
+prom-graf
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm pull prometheus-community/prometheus
+tar zxf prometheus-25.30.1.tgz
+cp prometheus/values.yaml prometheus-valuees.yaml
+helm upgrade --install --create-namespace --values prometheus-valuees.yaml  prometheus -n monitoring prometheus-community/prometheus
+
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm pull grafana/grafana
+tar xzf grafana-8.6.0.tgz
+cp grafana/values.yaml grafana-values.yaml
+helm upgrade --install --create-namespace --values grafana-values.yaml  grafana -n monitoring grafana/
+
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+helm repo add tricksterproxy https://helm.tricksterproxy.io/
+helm pull tricksterproxy/trickster
+tar xzf trickster-1.5.4.tgz
+cp trickster/values.yaml trickster-values.yaml
+helm upgrade --install --create-namespace --values trickster-values.yaml trickster -n monitoring tricksterproxy/trickster

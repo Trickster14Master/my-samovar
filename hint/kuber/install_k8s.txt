@@ -1,0 +1,101 @@
+Сетап на каждой ноде
+
+=
+-----------------------------------------------
+sudo apt-get update -y
+sudo apt-get install -y apt-transport-https ca-certificates curl
+
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update -y
+sudo apt-get install -y kubelet kubeadm kubectl containerd
+sudo apt-mark hold kubelet kubeadm kubectl
+
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+
+
+sudo mkdir /etc/containerd/
+nano /etc/containerd/config.toml
+
+вставить 
+version = 2
+[plugins]
+  [plugins."io.containerd.grpc.v1.cri"]
+   [plugins."io.containerd.grpc.v1.cri".containerd]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          runtime_type = "io.containerd.runc.v2"
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+            SystemdCgroup = true
+
+systemctl restart containerd
+-----------------------------------------------
+=
+
+
+создание кластера с одним мастером 
+=
+-----------------------------------------------
+поднятие мастера 
+
+sudo kubeadm init \
+  --apiserver-advertise-address= [адрес мастера] \
+  --pod-network-cidr 10.244.0.0/16
+  
+сгенирировать новый токен
+kubeadm token generate   
+
+сгенирировать команду для подключения работяги (на мастере) 
+kubeadm token create [результат kubeadm token generate ] --print-join-command --ttl=0
+
+kubeadm token create m6qtgm.rq3i1qmaovv9a8si --print-join-command --ttl=0
+
+подключение работяги 
+kubeadm join 192.168.0.120:6443 --token [результат kubeadm token generate ] --discovery-token-ca-cert-hash sha256:0cacbf9873981fdfa4b216f558f89c4def5c51666ea2bf06defbb5edb02854ce
+
+
+импорт конфигурации для kubectl
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+-----------------------------------------------
+=
+
+
+Создание кластера с несколькими мастерами 
+
+=
+-----------------------------------------------
+создание мастера 
+kubeadm init --pod-network-cidr 10.244.0.0/16 --control-plane-endpoint "192.168.0.204:6443" --upload-certs --v=5
+
+получаем команды для подключения мастеров и воркеров 
+
+мастер 
+kubeadm join 192.168.0.204:6443 --token aax7g9.qd1m2yeg5uktm7s7 --discovery-token-ca-cert-hash sha256:15b53d59f8d213dbf88d162365c26b0ba0541943e2ca2c98deb2c4e2f4028145 --control-plane --certificate-key fd9a624dc7e2b507807d588c7790ebbb0f0d8625212778e96927a25484155d0f
+
+воркер 
+kubeadm join 192.168.0.204:6443 --token g3m3k2.p1wzoti3x08d4ejv         --discovery-token-ca-cert-hash sha256:ce97d9eb7bdee71ddaffdf2dad04c5bf45d5c5db8a0553082324ea2ff076f798
+
+После чего ставим cilium 
+helm repo add cilium https://helm.cilium.io/
+
+CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+CLI_ARCH=amd64
+if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
+curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
+sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
+rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+
+helm install cilium cilium/cilium --version 1.16.5 \
+  --namespace kube-system
+
+-----------------------------------------------
+=

@@ -1,0 +1,23 @@
+mount
+
+lsblk
+вывести все подключённые носители 
+
+созданить раздел на диске
+gdisk /dev/sdb
+
+создать файловую систему 
+mkfs.ext4 /dev/sdb1
+
+создаём папку для монтирования нового диска 
+sudo mkdir /mnt/yt_filestore
+
+монтируем устройство 
+sudo mount /dev/sdb1 /mnt/yt_filestore
+
+получаем uuid диска 
+lsblk -f
+
+записываем новый диск в конфигурацию
+sudo nano /etc/fstab
+/dev/disk/by-uuid/[uuid диска] /mnt/yt_filestore (то куда маунтили) ext4 defaults 0 2 

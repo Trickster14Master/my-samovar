@@ -1,0 +1,22 @@
+FROM golang:1.20-alpine AS  builder # изначальный оброз 
+
+WORKDIR /usr/local/sre # папка в которое будет всё запускаться 
+
+RUN apk --no-cache add bash git make gcc gettext musl-dev # добавляем библиотеки 
+
+COPY ["app/go.mod", "app/go.sum", "./"] # эшируем файлы в рабочую директорию 
+
+RUN go mod download # применили все библиотеки 
+
+# build
+
+COPY app ./ # копируем само приложение в контейнер 
+
+RUN go build -o ./bin/app cmd/app/main.go # собираем оброз 
+
+FROM alpine AS runner # создаём новый образ на базе alpine
+
+COPY --from=builder /usr/local/src/bin/app / # копируем из образа builder содержимое проекта 
+COPY configs/config.yaml /config.yaml # копируем конфигурацию 
+
+CMD ["/app"] # запускаем проект 

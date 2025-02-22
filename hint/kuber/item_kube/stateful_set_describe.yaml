@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-state
+spec:
+  selector:
+    matchLabels:
+      app: postgres-state
+  serviceName: postgres-headless
+  replicas: 5
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: postgres-state
+    spec:
+      containers:
+        - name: postgres-state
+          image: postgres:latest
+          imagePullPolicy: "IfNotPresent"
+          env:
+           - name: POSTGRES_USER
+             value: root
+           - name: POSTGRES_PASSWORD
+             value: password12
+           - name: POSTGRES_DB
+             value: post1
+          volumeMounts:
+            - name: postgresdata
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: postgresdata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: db-data
+      resources:
+        requests:
+          storage: 10Gi

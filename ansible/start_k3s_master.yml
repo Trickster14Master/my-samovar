@@ -1,0 +1,9 @@
+- name: delete master node
+  hosts: master-node
+  become: yes
+
+  tasks:
+  - name: reboot master node
+    command: sudo systemctl start k3s
+
+

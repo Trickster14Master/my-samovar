@@ -1,0 +1,133 @@
+
+
+█████████████████████████████████████
+█─▄▄▄─█▄─▄▄▀█▄─▄▄─██▀▄─██─▄─▄─█▄─▄▄─█
+█─███▀██─▄─▄██─▄█▀██─▀─████─████─▄█▀█
+█▄▄▄▄▄█▄▄█▄▄█▄▄▄▄▄█▄▄█▄▄██▄▄▄██▄▄▄▄▄█
+
+// переменные с значениями 
+const database = 'demo';
+const collectionName = 'user';
+const collectionNew = 'new';
+
+// создание базы
+use(database);
+
+// Создаём новые таблицы.
+const collectionname = db.createCollection(collectionName);
+// создание конекта с таблицей 
+const getcollectionname = db.getCollection(collectionName);
+
+█████████████████████████████████████
+█▄─▄▄▀█▄─▄▄─█▄─▄███▄─▄▄─█─▄─▄─█▄─▄▄─█
+██─██─██─▄█▀██─██▀██─▄█▀███─████─▄█▀█
+█▄▄▄▄██▄▄▄▄▄█▄▄▄▄▄█▄▄▄▄▄██▄▄▄██▄▄▄▄▄█
+
+// удаление 
+getcollectionname.deleteMany(
+   {age: 1}
+)
+getcollectionname.find({}, {_id:0})
+
+удаление таблицы 
+db.new.drop();
+
+█████████████████████████████████████
+█▄─▄█▄─▀█▄─▄█─▄▄▄▄█▄─▄▄─█▄─▄▄▀█─▄─▄─█
+██─███─█▄▀─██▄▄▄▄─██─▄█▀██─▄─▄███─███
+█▄▄▄█▄▄▄██▄▄█▄▄▄▄▄█▄▄▄▄▄█▄▄█▄▄██▄▄▄██
+
+// вставка одного значения 
+getcollectionname.insertOne({name:'user2', email:'mail2', age:1, letters: ['a','b'], dop:{a:1, b:3}})
+
+
+// создание коллекции для вставки 
+const users = [
+    {name: 'user1', email: 'user1@as.mail'},
+];
+// вставка нескольких значений 
+getcollectionname.insertMany(users);
+
+██████████████████████████████████████
+█▄─██─▄█▄─▄▄─█▄─▄▄▀██▀▄─██─▄─▄─█▄─▄▄─█
+██─██─███─▄▄▄██─██─██─▀─████─████─▄█▀█
+██▄▄▄▄██▄▄▄███▄▄▄▄██▄▄█▄▄██▄▄▄██▄▄▄▄▄█
+
+// обновление одного значения 
+getcollectionname.updateOne({age:13}, {$set: {age:25}})
+getcollectionname.find({}, {_id:0})
+
+// обновление всех объектов 
+getcollectionname.updateMany({age:13}, {$set: {age:25}})
+getcollectionname.find({}, {_id:0})
+
+// пересоздать объем
+getcollectionname.replaceOne(
+   {age:25},
+   {name: 'new User', age: 32, password: 'dsaj24209cdsnbuhn'}
+)
+getcollectionname.find({}, {_id:0})
+
+█████████████████████████████████████
+█─▄▄▄▄█▄─▄▄─█▄─▄███▄─▄▄─█─▄▄▄─█─▄─▄─█
+█▄▄▄▄─██─▄█▀██─██▀██─▄█▀█─███▀███─███
+█▄▄▄▄▄█▄▄▄▄▄█▄▄▄▄▄█▄▄▄▄▄█▄▄▄▄▄██▄▄▄██
+
+// вывод значение 
+getcollectionname.find();
+
+// выборка без id 
+getcollectionname.find({}, {_id:0}).limit(2);
+
+// сортировка по возрасту 
+getcollectionname.find({}, {_id:0}).sort({age: 1})
+
+// фильтрация 
+getcollectionname.find({age:1}, {_id:0}).sort({age: 1})
+
+// фильтрация или
+getcollectionname.find({$or:[{age:1, email:'mail2'}]}, {_id:0}).sort({age: 1})
+
+// фильтрация по значениям где возраст меньше н ного значения (gt больше чем)
+getcollectionname.find({$or:[{age:{$lt:38}, email:'mail2'}]}, {_id:0}).sort({age: 1})
+
+// ишим соответствие по массиву данных 
+getcollectionname.find({name: {$in:['user2','user1']}}, {_id:0})
+
+// выводим только те поля у которых есть определённое значения  
+getcollectionname.find({letters: {$exists: true}}, {_id:0})
+
+// поиск по тексту
+// сначала создаём индекс на поле
+getcollectionname.createIndex({name: "text"})
+// ишим по индексу
+getcollectionname.find({$text:{$search: "blsg"}})
+
+// подсчёт 
+getcollectionname.count({name: "user1"})
+
+// вывод уникальных значений 
+getcollectionname.distinct("name")
+
+// агрегация 
+getcollectionname.aggregate([
+  {$match: {}},
+  {$group: {_id: "user3", age:{$sum:"$age"}}},
+])
+
+// сразу несколько запросов 
+getcollectionname.bulkWrite([
+   {
+     insertOne:{
+       "document": 
+         {name:'user3', email:'mail3', age:3, letters: ['a','b','c'], dop:{a:1, b:3}}
+     }
+   },
+   {
+     deleteOne:{
+       "filter": 
+         {age:34}
+     }
+   }
+])
+

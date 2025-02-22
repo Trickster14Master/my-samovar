@@ -1,0 +1,386 @@
+░█████╗░██████╗░███████╗░█████╗░████████╗███████╗
+██╔══██╗██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██╔════╝
+██║░░╚═╝██████╔╝█████╗░░███████║░░░██║░░░█████╗░░
+██║░░██╗██╔══██╗██╔══╝░░██╔══██║░░░██║░░░██╔══╝░░
+╚█████╔╝██║░░██║███████╗██║░░██║░░░██║░░░███████╗
+░╚════╝░╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+
+создание базы
+CREATE DATABASE test
+
+создание таблицы 
+CREATE TABLE users
+(
+	id_user integer PRIMARY KEY,
+	name_user varchar(128) NOT NULL,
+	addres_user text NOT NULL
+);
+
+создание таблицы с внешним ключом 
+CREATE TABLE job
+(
+	id_job integer PRIMARY KEY,
+	name_jobvar char(128) NOT NULL,
+	addres_job text NOT NULL,
+	fk_users_id integer REFERENCES users(id_user) NOT NULL
+);
+
+создание таблиц многие ко многим 
+
+CREATE TABLE book
+(
+	id_book serial PRIMARY KEY,
+	title text NOT NULL,
+	isbn text NOT NULL
+);
+
+
+CREATE TABLE author
+(
+	id_author int PRIMARY KEY,
+	full_name text NOT NULL,
+	rating real
+);
+
+CREATE TABLE book_author
+(
+	id_book int REFERENCES book(id_book),
+	id_author int REFERENCES author(id_author),
+
+	CONSTRAINT book_autor_pkey PRIMARY KEY (id_book, id_author)
+);
+
+Добавить колонку в таблицу 
+ALTER TABLE book
+ADD COLUMN deskribe_book varchar
+
+переименовать таблицу 
+ALTER TABLE book
+RENAME TO book1
+
+Изменение типа столбца 
+ALTER TABLE book1
+ALTER COLUMN title SET DATA TYPE varchar(64);
+
+██████╗░███████╗██╗░░░░░███████╗████████╗███████╗
+██╔══██╗██╔════╝██║░░░░░██╔════╝╚══██╔══╝██╔════╝
+██║░░██║█████╗░░██║░░░░░█████╗░░░░░██║░░░█████╗░░
+██║░░██║██╔══╝░░██║░░░░░██╔══╝░░░░░██║░░░██╔══╝░░
+██████╔╝███████╗███████╗███████╗░░░██║░░░███████╗
+╚═════╝░╚══════╝╚══════╝╚══════╝░░░╚═╝░░░╚══════╝
+
+удаление таблицы 
+DROP TABLE users;
+
+удаление записи 
+DELETE FROM job
+WHERE id_job=1;
+
+Удаление столбца 
+ALTER TABLE book
+DROP COLUMN deskribe_book varchar
+
+
+██╗███╗░░██╗░██████╗███████╗██████╗░████████╗
+██║████╗░██║██╔════╝██╔════╝██╔══██╗╚══██╔══╝
+██║██╔██╗██║╚█████╗░█████╗░░██████╔╝░░░██║░░░
+██║██║╚████║░╚═══██╗██╔══╝░░██╔══██╗░░░██║░░░
+██║██║░╚███║██████╔╝███████╗██║░░██║░░░██║░░░
+╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░
+
+Вставить
+INSERT INTO users 
+VALUES 
+(1, 'User1', 'Add1'),
+(2, 'User2', 'Add2');
+
+обновить конкретное значение 
+UPDATE job
+SET name_jobvar = 'new name'
+WHERE id_job=2
+
+обновить всё 
+UPDATE job
+SET name_jobvar = 'new name'
+
+░██████╗███████╗██╗░░░░░███████╗░█████╗░████████╗
+██╔════╝██╔════╝██║░░░░░██╔════╝██╔══██╗╚══██╔══╝
+╚█████╗░█████╗░░██║░░░░░█████╗░░██║░░╚═╝░░░██║░░░
+░╚═══██╗██╔══╝░░██║░░░░░██╔══╝░░██║░░██╗░░░██║░░░
+██████╔╝███████╗███████╗███████╗╚█████╔╝░░░██║░░░
+╚═════╝░╚══════╝╚══════╝╚══════╝░╚════╝░░░░╚═╝░░░
+
+простая выборка 
+SELECT *
+FROM categories
+
+математические операции 
+SELECT product_id, product_name, unit_price * units_in_stock
+FROM products 
+
+Вывод уникальных значений 
+SELECT DISTINCT country 
+FROM employees  
+
+Вывести количество элементов в таблице 
+SELECT COUNT (DISTINCT country) 
+FROM employees 
+
+Фильтрация 
+SELECT company_name
+FROM customers 
+WHERE country = 'USA'
+
+- больше 
+SELECT *
+FROM products 
+WHERE unit_price>20
+
+- дата
+SELECT *
+FROM orders 
+WHERE order_date >'1998-03-01'
+
+- И
+SELECT *
+FROM products  
+WHERE unit_price > 25 AND units_in_stock > 40 
+
+- или 
+SELECT *
+FROM products  
+WHERE unit_price > 25 or units_in_stock > 40 
+
+- вместе 
+SELECT *
+FROM orders  
+WHERE shipped_date > '1998-04-30' AND (freight < 70 OR freight > 150) 
+
+- диапазон 
+SELECT *
+FROM orders  
+WHERE freight BETWEEN 20 AND 40
+
+- из 
+SELECT *
+FROM customers   
+WHERE country IN ('Mexico', 'Germany')
+
+- упорядочить 
+SELECT *
+FROM customers   
+ORDER BY country  
+
+- упорядочить по убыванию 
+SELECT *
+FROM customers   
+ORDER BY country DESC
+
+- упорядочить по нескольким столбцам 
+SELECT DISTINCT country, city
+FROM customers   
+ORDER BY country, city
+
+- лимит 
+SELECT DISTINCT country, city
+FROM customers   
+LIMIT 10
+
+- группировка 
+SELECT ship_country, COUNT(*)
+FROM orders
+WHERE freight > 50
+GROUP BY ship_country
+ORDER BY COUNT (*) DESC
+
+-пост обработка (HAVING)
+SELECT category_id, SUM(unit_price * units_in_stock)
+FROM products  
+WHERE discontinued <> 1
+GROUP BY category_id 
+HAVING SUM(unit_price * units_in_stock) > 5000
+ORDER BY SUM(unit_price * units_in_stock)
+
+- Объединение таблиц 
+SELECT country
+FROM customers 
+UNION 
+SELECT country
+FROM employees
+
+- Пересечения в таблицах 
+SELECT country
+FROM customers 
+INTERSECT  
+SELECT country
+FROM suppliers
+
+- Не пересекаются 
+SELECT country
+FROM customers 
+EXCEPT  
+SELECT country
+FROM suppliers
+
+░░░░░██╗░█████╗░██╗███╗░░██╗
+░░░░░██║██╔══██╗██║████╗░██║
+░░░░░██║██║░░██║██║██╔██╗██║
+██╗░░██║██║░░██║██║██║╚████║
+╚█████╔╝╚█████╔╝██║██║░╚███║
+░╚════╝░░╚════╝░╚═╝╚═╝░░╚══╝
+
+INNER JOIN
+Внутренние соединение, в таблице попадают только те запись где есть одинаковые id 
+SELECT product_name, suppliers.company_name, units_in_stock
+FROM products
+INNER JOIN suppliers ON products.supplier_id = suppliers.supplier_id (тут отмечаем те записи в products где есть значения из suppliers)
+ORDER BY units_in_stock DESC
+
+SELECT category_name, SUM(units_in_stock)
+FROM products
+INNER JOIN categories ON products.category_id = categories.category_id
+GROUP BY category_name
+ORDER BY SUM(units_in_stock) DESC
+LIMIT 5
+
+сокращённая запись 
+SELECT category_name, SUM(units_in_stock)
+FROM products
+INNER JOIN categories USING(category_id)
+GROUP BY category_name
+ORDER BY SUM(units_in_stock) DESC
+LIMIT 5
+
+Left JOIN 
+Позволяет вывести абсолютно все записи даже NULL
+SELECT company_name, order_id
+FROM customers
+LEFT JOIN orders ON orders.customer_id = customers.customer_id
+WHERE order_id IS NULL
+
+░██████╗██╗░░░██╗██████╗░░██████╗░██╗░░░██╗███████╗██████╗░██╗███████╗░██████╗
+██╔════╝██║░░░██║██╔══██╗██╔═══██╗██║░░░██║██╔════╝██╔══██╗██║██╔════╝██╔════╝
+╚█████╗░██║░░░██║██████╦╝██║██╗██║██║░░░██║█████╗░░██████╔╝██║█████╗░░╚█████╗░
+░╚═══██╗██║░░░██║██╔══██╗╚██████╔╝██║░░░██║██╔══╝░░██╔══██╗██║██╔══╝░░░╚═══██╗
+██████╔╝╚██████╔╝██████╦╝░╚═██╔═╝░╚██████╔╝███████╗██║░░██║██║███████╗██████╔╝
+
+Использование вложенных запросов 
+SELECT company_name
+FROM suppliers
+WHERE country IN (SELECT DISTINCT country
+				  FROM customers
+)
+
+Использование вложенного запроса с соединением таблиц 
+SELECT category_name, SUM (units_in_stock)
+FROM products
+INNER JOIN categories USING (category_id)
+GROUP BY category_name
+ORDER BY SUM (units_in_stock) DESC
+LIMIT (SELECT MIN (product_id) + 4 FROM products)
+
+Вложенный запрос с WHERE EXISTS, WHERE EXISTS работает только тогда когда в WHERE EXISTS возвращаеться хотябы одна строка 
+SELECT company_name, contact_name
+FROM customers
+WHERE EXISTS(
+	SELECT customer_id FROM orders
+	WHERE customer_id = customers.customer_id
+	AND freight BETWEEN 50 AND 100 
+)
+
+ANY, эти возвращеет значение если хотябы одно значение из подзапроса совпало с основным 
+SELECT DISTINCT company_name
+FROM customers
+WHERE customer_id = ANY(
+	SELECT customer_id
+	FROM orders
+	JOIN order_details USING (order_id)
+	WHERE quantity>40
+)
+
+░█████╗░░█████╗░███╗░░░███╗███╗░░░███╗░█████╗░███╗░░██╗██████╗░
+██╔══██╗██╔══██╗████╗░████║████╗░████║██╔══██╗████╗░██║██╔══██╗
+██║░░╚═╝██║░░██║██╔████╔██║██╔████╔██║███████║██╔██╗██║██║░░██║
+██║░░██╗██║░░██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██║╚████║██║░░██║
+╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░╚═╝░██║██║░░██║██║░╚███║██████╔╝
+░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░
+
+сетевой конфигурационный файл
+/etc/postgresql/<postgres_version>/main/pg_hba.conf
+
+рестарт postgre
+/etc/init.d/postgresql restart
+
+войти в консоль 
+psql
+
+список всех дб 
+postgres=# \l
+
+список всех user 
+postgres=# \du
+
+Переключиться на определённую БД 
+\с [name db]
+
+создать бд 
+create database [databasename];
+
+создание пользователя 
+CREATE USER users WITH PASSWORD '123asdf';
+
+Права супер пользователя 
+ALTER USER users WITH PASSWORD '123asdf';
+
+Изменить пользователю пароль 
+ALTER USER users WITH SUPERUSER;
+
+Выгрузка 
+COPY [name_table] TO [name_file];
+
+Выгрузка запроса 
+COPY (SELECT * FROM product) TO [name_file];
+
+Загрузка
+COPY [name_table] FROM [name_file] WHERE id !=2;
+
+Бэкап 
+pg_dump --create -d [name_db]
+кастомный бэкап по определённому пути
+pg_dump --format=custom -d [name_db] -f [path]/db1.custom 
+
+восстановление из бэкапа таблицы 
+pg_restor --teble=[name_table] -p 5433 -d db2 [path]/db1.custom 
+
+восстановление из бэкапа целиком 
+pg_restore --create -p 5433 -d [name_db] [path]/db1.custom 
+
+Холодная копия 
+/var/lib/postgresql/[version]/[edition]
+
+Горячая копия 
+pg_basebackup --pgdata=/var/lib/postgresql/test/ --progress
+
+Копия для реплики 
+Создание слота
+SELECT pg_create_physical_replication_slot('replica');
+создание копии 
+pg_basebackup --pgdata=/var/lib/postgresql/test/ -R --slot=replica
+
+
+Реплика 
+apt install postgresql-contrib
+
+CREATE ROLE replica_user WITH REPLICATION LOGIN PASSWORD 'replikaplus';
+
+Настройка конфига 
+
+/etc/postgresql/16/main/postgresql.conf
+	listen_addresses = '*'
+	wal_level = logical
+	wal_log_hints = on
+
+/etc/postgresql/16/main/pg_hba.conf
+	host    replication     replica_user    192.168.0.109/24        md5
+
+pg_basebackup -h 192.168.0.158 -U replica_user -X stream -C -S replica_1 -v -R -D /var/lib/postgresql/16/main/

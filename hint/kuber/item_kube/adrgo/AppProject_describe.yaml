@@ -1,0 +1,22 @@
+# item существующий внутри argo преднозначенный для групировки приложений 
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  # название проекта 
+  name: development
+  namespace: argocd
+  # поле преднозначенное для котго чтобы небыло возможности удалить AppProject если к непу прекреплены приложения 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Project containing development environment services
+  # то откуда приложение сможет брать код 
+  sourceRepos:
+    - '*'
+  # указываем то где argo может наводить порядки 
+  destinations:
+    - namespace: '*'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

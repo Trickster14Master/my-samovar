@@ -1,0 +1,34 @@
+# приложение argo длагодоря которому есть возможность управлять элементами кубера 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kuber
+  # куда диплоить Application
+  namespace: argocd
+  # 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # проект к которому будут относиться элементы кубера 
+  project: development
+
+  # указываем из какого git репозитория мы ходим брать код 
+  source:
+    repoURL: https://github.com/bakavets/k8s-lessons.git  # Ссылка на гит 
+    targetRevision: master  # из какой ветки брать файлы 
+    path: lesson-30/dev/kuber  # доп путь внутри гит где лежать кубер файлы 
+
+  # в какой кубер задеплоить данные 
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kuber-argo
+
+  # доп настроки 
+  syncPolicy:
+    # указываем что при обновлении данных на гит должен обновиться деплой 
+    automated:
+      prune: true # автоматическое удаление ресурсов что нет на гите 
+      selfHeal: true # устнавливаем чтобы было соответствие можду тем что на гите и тем что в класстере
+    syncOptions:
+    # позволяем создавать автоматически нейм спейсы
+    - CreateNamespace=true

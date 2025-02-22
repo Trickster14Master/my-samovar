@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kuber-rc
+spec:
+  replicas: 3 # сколько контейнеров должно быть запущенно 
+  selector: # с помощью меток определяем какими подпми надо руководить
+    app: http-server
+  template:
+    metadata:
+      name: kuber-app
+      labels:
+        app: http-server
+    spec: # контейнеры 
+      containers:
+      - name: http-server-image
+        image: bokovets/kuber
+        ports:
+        - containerPort: 8000

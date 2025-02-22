@@ -1,0 +1,72 @@
+- name: setap k8s
+  hosts: k8s-worker-node, k8s-master-node
+  become: yes 
+  vars:
+    pakages1:   
+            - apt-transport-https
+            - ca-certificates
+            - curl
+    pakages2:   
+            - kubelet
+            - kubeadm
+            - kubectl
+            - containerd
+  tasks:   
+  - name: updete
+    apt:
+      update_cache: true
+      cache_valid_time: 3600
+      force_apt_get: true
+
+  - name: Install pekeg
+    apt:
+      pkg: "{{pakages1}}" 
+      state: present
+
+  - name: create dir
+    ansible.builtin.file:
+      path: /etc/apt/keyrings
+      state: directory
+
+  - name: Add an Apt signing key to a specific keyring file
+    ansible.builtin.apt_key:
+      url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key 
+      keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+
+  - name: deb
+    ansible.builtin.command: "echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list "
+
+  - name: updete
+    apt:
+      update_cache: true
+      cache_valid_time: 3600
+      force_apt_get: true
+
+  - name: Install pekeg 2
+    apt:
+      pkg: "{{pakages2}}" 
+      state: present
+
+  - name: statik pakege
+    ansible.builtin.command: apt-mark hold kubelet kubeadm kubectl
+
+  - name: forward
+    ansible.builtin.command: echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+
+  - name: iptables=1
+    ansible.builtin.command: echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf  
+
+  - name: create dir containerd
+    ansible.builtin.file:
+      path: /etc/containerd/
+      state: directory
+
+  - name: copy File
+    copy:
+      src: /home/main-serv/k8s/configfile/config.toml
+      dest: /etc/containerd/
+      mode: 0777
+
+  - name: restart containerd
+    ansible.builtin.command: systemctl restart containerd

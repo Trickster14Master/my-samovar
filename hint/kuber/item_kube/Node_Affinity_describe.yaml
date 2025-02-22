@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: with-node-affinity-hard
+  labels:
+    app: kuber
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: http-server
+  template:
+    metadata:
+      labels:
+        app: http-server
+    spec:
+      containers:
+        - name: kuber-app
+          image: bakavets/kuber
+          ports:
+            - containerPort: 8000
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            # тут перечислены все лейблы (ИЛИ)
+            - matchExpressions:
+              - key: longhorn
+                operator: In
+                values:
+                - eu-west-1a
+                - eu-west-1c
+            - matchExpressions:
+              - key: instance-type
+                operator: In
+                values:
+                - m5.xlarge
+                - m5n.xlarge
+            - matchExpressions:
+              - key: capacityType
+                operator: In
+                values:
+                - spot
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: with-node-affinity-soft
+  labels:
+    app: kuber
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: http-server
+  template:
+    metadata:
+      labels:
+        app: http-server
+    spec:
+      containers:
+        - name: kuber-app
+          image: bakavets/kuber
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: '1'
+              memory: 512Mi
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - eu-west-1a
+                - eu-west-1b
+          preferredDuringSchedulingIgnoredDuringExecution:
+          # указываем услоный векс ноде, чем вес больше тем у ноды больше приоритет при запуске подов 
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - ip-10-23-15-55.eu-west-1.compute.internal
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - ip-10-23-60-237.eu-west-1.compute.internal
+          - weight: 70
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - ip-10-23-93-136.eu-west-1.compute.internal

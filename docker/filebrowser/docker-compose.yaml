@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+    filebrowser:
+        container_name: filebrowser
+        volumes:
+        - /home/filebrowser/file:/srv
+        - /home/filebrowser/filebrowser.db:/database/filebrowser.db
+        environment:
+        - PUID=0
+        - PGID=0
+        ports:
+        - 9090:80
+        restart: always
+        image: filebrowser/filebrowser:s6

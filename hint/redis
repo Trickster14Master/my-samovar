@@ -1,0 +1,57 @@
+REDIS 
+
+Установить значение строки 
+SET firstKey "Hello"
+
+Увеличить значение на 3 
+INCRBY num 3
+
+Получчить значение 
+GET firstKey
+
+Удалить значение 
+DEL firstKey
+
+Получить все значения 
+KEYS * 
+
+Добавить список 
+LPUSH cars Toy
+
+Получить значения из списка 
+LRANGE cars 0 -1
+
+Получить значения по индексу 
+LINDEX cars 0 
+
+Получить значение и удалить 
+LPOP cars 
+
+Длина списка 
+LLEN cars
+
+Установить значение на индекс 
+LSET cars 0 ford
+
+Переместить значение между списками
+LMOVE cars sold LEFT LEFT
+
+
+Создание хэш таблиц
+HSET iphone brand Apple model "iPhonx" memory 64 color black
+
+Получение значения из хэг таблици 
+HGET iphone model
+
+Получить сразу несколько значений 
+HMGET iphone model memory
+
+Получить значение всех атребутов 
+HGETALL iphone
+
+Добавить значени
+HINCRBY iphone memory 64
+
+
+Задать время жизни 
+EXPIRE cars 10 

@@ -1,0 +1,59 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "creationTimestamp": "2025-02-11T15:47:46Z",
+        "deletionTimestamp": "2025-02-12T04:26:34Z",
+        "labels": {
+            "kubernetes.io/metadata.name": "longhorn-system",
+            "name": "longhorn-system"
+        },
+        "name": "longhorn-system",
+        "resourceVersion": "10869497",
+        "uid": "26dd6559-d40b-4560-a4c8-e50f858b5773"
+    },
+    "spec": {
+        "finalizers": [
+                  ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2025-02-12T04:28:38Z",
+                "message": "All resources successfully discovered",
+                "reason": "ResourcesDiscovered",
+                "status": "False",
+                "type": "NamespaceDeletionDiscoveryFailure"
+            },
+            {
+                "lastTransitionTime": "2025-02-12T04:28:38Z",
+                "message": "All legacy kube types successfully parsed",
+                "reason": "ParsedGroupVersions",
+                "status": "False",
+                "type": "NamespaceDeletionGroupVersionParsingFailure"
+            },
+            {
+                "lastTransitionTime": "2025-02-12T04:28:38Z",
+                "message": "Failed to delete all resource types, 1 remaining: Internal error occurred: failed calling webhook \"validator.longhorn.io\": failed to call webhook: Post \"https://longhorn-admission-webhook.longhorn-system.svc:9502/v1/webhook/validation?timeout=10s\": service \"longhorn-admission-webhook\" not found",
+                "reason": "ContentDeletionFailed",
+                "status": "True",
+                "type": "NamespaceDeletionContentFailure"
+            },
+            {
+                "lastTransitionTime": "2025-02-12T04:28:38Z",
+                "message": "Some resources are remaining: sharemanagers.longhorn.io has 1 resource instances, volumeattachments.longhorn.io has 1 resource instances, volumes.longhorn.io has 1 resource instances",
+                "reason": "SomeResourcesRemain",
+                "status": "True",
+                "type": "NamespaceContentRemaining"
+            },
+            {
+                "lastTransitionTime": "2025-02-12T04:28:38Z",
+                "message": "Some content in the namespace has finalizers remaining: longhorn.io in 3 resource instances",
+                "reason": "SomeFinalizersRemain",
+                "status": "True",
+                "type": "NamespaceFinalizersRemaining"
+            }
+        ],
+        "phase": "Terminating"
+    }
+}

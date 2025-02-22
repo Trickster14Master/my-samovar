@@ -1,0 +1,40 @@
+NFS сервер
+
+apt install nfs-kernel-server
+systemctl enable nfs-server
+
+nano /etc/exports
+/home/openfolder 192.168.0.0/255.255.255.0 (rw,no_subtree_check)
+
+rw - разрешить чтение и запись в этой папке;
+ro - разрешить только чтение;
+sync - отвечать на следующие запросы только тогда, когда данные будут сохранены на диск (по умолчанию);
+async - не блокировать подключения пока данные записываются на диск;
+secure - использовать для соединения только порты ниже 1024;
+insecure - использовать любые порты;
+nohide - не скрывать поддиректории при, открытии доступа к нескольким директориям;
+root_squash - подменять запросы от root на анонимные, используется по умолчанию;
+no_root_squash - не подменять запросы от root на анонимные;
+all_squash - превращать все запросы в анонимные;
+subtree_check - проверять не пытается ли пользователь выйти за пределы экспортированной папки;
+no_subtree_check - отключить проверку обращения к экспортированной папке, улучшает производительность, но снижает безопасность, можно использовать когда экспортируется раздел диска;
+anonuid и anongid - указывает uid и gid для анонимного пользователя.
+
+systemctl restart nfs-kernel-server
+
+
+Клиенты 
+установка клиента
+sudo apt install nfs-common 
+маунт 
+mount 192.168.0.134:/home/openfolder  /mnt/nfs/openfolder/
+проверка 
+df -h
+
+sudo apt install autofs
+
+nano /etc/auto.master
+/mnt/nfs /etc/auto.nfs --ghost --timeout=60
+
+nano /etc/auto.nfs
+openfolder -fstype=nfs4, rw 192.168.0.134:/home/openfolder

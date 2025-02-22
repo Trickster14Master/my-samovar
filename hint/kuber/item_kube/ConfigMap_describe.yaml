@@ -1,0 +1,164 @@
+# с помощью конфиг мапа мы посути выносим переменные env в отдельный файл 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-cm
+data:
+  # тут мы посути указываем значения типа ключ значение 
+  interval: "5"
+  count: "3"
+  # передаём сразу несколько строчик 
+  properties: |
+    Hello from World!
+    This is demo config!
+    As an example.
+  config.ini: "This is demo config!"
+---
+# деплой в котором мы используем конфиг мап 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber-2
+  labels:
+    app: kuber-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http-server-2
+  template:
+    metadata:
+      labels:
+        app: http-server-2
+    spec:
+      containers:
+      - name: kuber-app
+        image: bakavets/kuber:v1.0-args
+        args: ["$(INTERVAL)","$(COUNT)","$(TEXT_ARG)"]
+        ports:
+        - containerPort: 8000
+        env:
+          # берём значения из конфиг мапа 
+          - name: INTERVAL
+            valueFrom:
+              configMapKeyRef:
+                name: demo-cm
+                key: interval
+          - name: COUNT
+            valueFrom:
+              configMapKeyRef:
+                name: demo-cm
+                key: count
+          - name: TEXT_ARG
+            valueFrom:
+              configMapKeyRef:
+                name: demo-cm
+                key: properties
+        # тут мы прокидываем конфиг мап в деплой  
+        volumeMounts:
+        - name: config
+          mountPath: "/config"
+          readOnly: true
+      volumes:
+        # получаем конфиг мэп в поде 
+        - name: config
+          configMap:
+            # указываем какой конфиг мэп брать 
+            name: demo-cm
+            # указываем какие ключи взять из конфиг мэпа и создать на основе них файлы 
+            items:
+            - key: "properties"
+              path: "properties"
+            - key: "config.ini"
+              path: "config.ini"
+---
+# проброс сразу всех переменных из конфиг мапа 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-cm
+data:
+  INTERVAL: "3"
+  COUNT: "6"
+  TEXT_ARG: |
+    Hello from World!
+    This is demo config!
+    As an example.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber-2
+  labels:
+    app: kuber-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http-server-2
+  template:
+    metadata:
+      labels:
+        app: http-server-2
+    spec:
+      containers:
+      - name: kuber-app
+        image: bakavets/kuber:v1.0-args
+        args: ["$(INTERVAL)","$(COUNT)","$(TEXT_ARG)"]
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - # проброс сразу всего конфиг пэпа 
+          configMapRef:
+            name: demo-cm
+---
+# использование конфиг мэпа как конфигурационного файла для пода 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf-file
+  labels:
+    app: nginx
+data:
+  # конфиг файл для nginx
+  nginx.conf: |
+    server {
+      listen 80;
+      access_log /var/log/nginx/reverse-access.log;
+      error_log /var/log/nginx/reverse-error.log;
+      location / {
+            proxy_pass https://github.com/bakavets;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-proxy
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+          - containerPort: 80
+          # мантируем в контейнер данные из конфиг мапа 
+          volumeMounts:
+            - name: nginx-conf
+              # куда мантируем 
+              mountPath: /etc/nginx/conf.d/
+              readOnly: true
+      # указываем каой конфиг мап надо мантировать 
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf-file

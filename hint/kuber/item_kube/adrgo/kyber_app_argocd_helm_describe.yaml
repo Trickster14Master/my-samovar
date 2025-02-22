@@ -1,0 +1,47 @@
+# работа с helm 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  # болок с гит 
+  source:
+    repoURL: https://github.com/bakavets/k8s-lessons.git
+    targetRevision: master
+    path: lesson-30/charts/demo
+
+    helm:
+      # передаём параметры внутри этого деплой файла 
+      parameters:
+      - name: "service.port"
+        value: "8082"
+
+      # передаём параметры в виде файла лежащиго на гите 
+      valueFiles:
+      - values-dev.yaml
+
+      # 
+      values: |
+        serviceAccount:
+          create: true
+          annotations:
+            demo/role: demo-annotation
+          name: sa-custom-name
+
+  # Destination cluster and namespace to deploy the application
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kuber-argo
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
