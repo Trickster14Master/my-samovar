@@ -10,7 +10,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnvailable: 1
+      maxUnavailable: 1
     type: {{ .Values.deployment.strategy_type}} 
   template:
     metadata:
@@ -22,19 +22,19 @@ spec:
           image: {{ .Values.spec.containers_image }}
           env:
            - name: {{ .Values.spec.env.env_name }}
-             values: {{ .Values.spec.env.env_values }}
+             value: {{ .Values.spec.env.env_values }}
           ports:
             - containerPort: {{ .Values.spec.port }}
           volumeMounts:
             - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
               name: {{ .Values.spec.volume_name }}
-      resources:
-        requests:
-          memory: {{ .Values.spec.resources_requests_memory }}
-          cpu: {{ .Values.spec.resources_requests_cpu }}
-        limits:
-          memory: {{ .Values.spec.resources_limits_memory }}
-          cpu: {{ .Values.spec.resources_limits_cpu }}
+          resources:
+            requests:
+              memory: {{ .Values.spec.resources_requests_memory }}
+              cpu: {{ .Values.spec.resources_requests_cpu }}
+            limits:
+              memory: {{ .Values.spec.resources_limits_memory }}
+              cpu: {{ .Values.spec.resources_limits_cpu }}
       volumes:
         - name: {{ .Values.spec.volume_name }}
           persistentVolumeClaim:

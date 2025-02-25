@@ -9,12 +9,12 @@
 CREATE DATABASE test
 
 создание таблицы 
-CREATE TABLE users
 (
 	id_user integer PRIMARY KEY,
 	name_user varchar(128) NOT NULL,
 	addres_user text NOT NULL
 );
+
 
 создание таблицы с внешним ключом 
 CREATE TABLE job
@@ -49,6 +49,8 @@ CREATE TABLE book_author
 
 	CONSTRAINT book_autor_pkey PRIMARY KEY (id_book, id_author)
 );
+
+
 
 Добавить колонку в таблицу 
 ALTER TABLE book
@@ -98,6 +100,10 @@ VALUES
 UPDATE job
 SET name_jobvar = 'new name'
 WHERE id_job=2
+
+UPDATE accounts 
+SET active  = 1
+WHERE tg_id=9529271388
 
 обновить всё 
 UPDATE job
@@ -305,6 +311,9 @@ WHERE customer_id = ANY(
 ╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░╚═╝░██║██║░░██║██║░╚███║██████╔╝
 ░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░
 
+вход в пользователя post
+sudo -i -u postgres
+
 сетевой конфигурационный файл
 /etc/postgresql/<postgres_version>/main/pg_hba.conf
 
@@ -367,6 +376,8 @@ SELECT pg_create_physical_replication_slot('replica');
 создание копии 
 pg_basebackup --pgdata=/var/lib/postgresql/test/ -R --slot=replica
 
+повышение привелегий 
+grant all privileges on database geo to rnis_geo;
 
 Реплика 
 apt install postgresql-contrib
@@ -384,3 +395,45 @@ CREATE ROLE replica_user WITH REPLICATION LOGIN PASSWORD 'replikaplus';
 	host    replication     replica_user    192.168.0.109/24        md5
 
 pg_basebackup -h 192.168.0.158 -U replica_user -X stream -C -S replica_1 -v -R -D /var/lib/postgresql/16/main/
+
+
+САМ POST
+
+В журнал транзакций записываются все операции с бд,
+REDO журнал последних изменений 
+WAL - гарантирует что информация об изменениях будет зафиксированна ДО реальных изменений 
+	LSN (log sequence number) оложение записи в WAL
+	страници маркеруются LSN
+	перед записью страници на диск, проверяем что LSN уже записан в журнал 
+
+SELECT pg_current_wal_insert_lsn(); - Получить LSN 
+SELECT pg_walfile_name('0/8459048'); - узнать файл WAL по LSN 
+
+/var/lib/postgresql/16/main
+
+PG_VERSION - Файл, содержащий номер основной версии PostgreSQL
+pg_hba.conf - Файл, управляющий аутентификацией клиента
+pg_ident.conf - Файл, управляющий сопоставлением имен пользователей PostgreSQL.
+postgresql.conf - Файл, используемый для установки параметров конфигурации.
+postgresql.auto.conf - Файл, используемый для хранения параметров конфигурации, которые устанавливаются при помощи ALTER SYSTEM
+postmaster.opts - Файл, содержащий параметры командной строки, с которыми сервер был запущен в последний раз
+
+Подкаталоги
+
+base/ - Подкаталог, содержащий подкаталоги для каждой базы данных
+global/ - Подкаталог, содержащий общие таблицы кластера, такие как pg_database
+pg_commit_ts/ - Подкаталог, содержащий данные о времени фиксации транзакций
+pg_clog/ (versions 9.6 or earlier) - Подкаталог, содержащий данные о состоянии транзакции. В версии 1- он переименован в  pg_xact . Подробное описание CLOG см. в Разделе 5.4.
+pg_dynshmem/ - Подкаталог, содержащий файлы, используемые подсистемой динамически разделяемой памяти
+pg_logical/ - Подкаталог, содержащий данные о состоянии для логического декодирования
+pg_multixact/ - Подкаталог, содержащий данные о состоянии мультитранзакций (используемые для разделяемой блокировки строк)
+pg_notify/ - Подкаталог, содержащий данные состояния прослушивания и уведомлений (LISTEN/NOTIFY)
+pg_repslot/ - Подкаталог, содержащий данные слота репликации
+pg_serial/ - Подкаталог, содержащий информацию о выполненных сериализуемых транзакциях.
+pg_snapshots/ - Подкаталог, содержащий экспортированные снимки (snapshots)
+pg_stat/ - Подкаталог, содержащий постоянные файлы для подсистемы статистики.
+pg_stat_tmp/ - Подкаталог, содержащий временные файлы для подсистемы статистики
+pg_subtrans/ - Подкаталог, содержащий данные о состоянии подтранзакций
+pg_tblspc/ - Подкаталог, содержащий символические ссылки на табличные пространства
+pg_twophase/ - Подкаталог, содержащий файлы состояний для подготовленных транзакций
+pg_xlog/ (versions 9.6 or earlier) -Подкаталог, содержащий файлы WAL (журнал предзаписи)

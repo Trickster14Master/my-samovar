@@ -1,0 +1,38 @@
+deployment:
+  deployment_name: rabbit-mg-deploy
+  app_label: rabbit-mg-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: rabbit-mg-container
+  containers_image: rabbitmq:3.10.7-management
+  port: 15672
+  env:
+    user_name: RABBITMQ_DEFAULT_USER
+    user_name_values: rmuser
+
+    user_password: RABBITMQ_DEFAULT_PASS
+    user_password_values: rmpassword
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "228Mi"
+  resources_limits-cpu: "1000m"
+
+  volume_name: rabbit-mg-volume
+  volumeMounts_mountPath: /var/lib/rabbitmq
+    
+service:
+  service_name: rabbit-mg-svc
+  port: 15672
+  target_port: 15672
+  type: LoadBalancer
+
+persistentVolumeClaim:
+  persistent_volume_claim_name: rabbit-mg-pvc
+  storage_class: longhorn
+  access_modes: ReadWriteOnce
+  size: 1Gi

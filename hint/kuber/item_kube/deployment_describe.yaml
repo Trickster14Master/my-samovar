@@ -10,7 +10,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnvailable: 1
+      maxUnavailable: 1
     type: RollingUpdate # указываем что наше приложение должно обнавляться плавно при изменении версии 
   template: # указываем какие теги повесить на поды 
     metadata:
