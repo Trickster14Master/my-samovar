@@ -5,7 +5,13 @@ metadata:
   namespace: jenkins
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins  # Это должно совпасть с метками подов
   template:
+    metadata:
+      labels:
+        app: jenkins  # Это должно совпасть с selector
     spec:
       containers:
       - name: jenkins
