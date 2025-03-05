@@ -21,6 +21,11 @@ spec:
         - name: kubeconfig-volume
           mountPath: /var/jenkins_home/.kube  # Путь, где будет доступен kubeconfig
           subPath: kubeconfig.yaml
+      - name: kubectl
+        image: alpine/k8s:1.27
+        command: ["/bin/sh", "-c"]
+        args: ["cat"]
+        tty: true
       volumes:
       - name: kubeconfig-volume
         secret:
