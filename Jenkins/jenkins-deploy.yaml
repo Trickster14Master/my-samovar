@@ -13,6 +13,7 @@ spec:
       labels:
         app: jenkins  # Это должно совпасть с selector
     spec:
+      serviceAccountName: jenkins  # Привязка сервис-аккаунта
       containers:
       - name: jenkins
         image: jenkins/jenkins:lts
