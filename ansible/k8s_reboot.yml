@@ -1,0 +1,10 @@
+- name: delete master node
+  hosts: k8s-master-node, k8s-worker-node, k8s-long
+  become: yes
+
+  tasks:
+  - name: reboot master node
+    command: systemctl stop kubelet | systemctl stop containerd
+
+  - name: reboot node
+    command: reboot

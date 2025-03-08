@@ -1,0 +1,48 @@
+statefulset:
+  statefulset_name: postgre-stateful-set
+  app_label: postgre-app
+  replicas: 2
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: postgre-container
+  containers_image: postgres:latest
+  port: 5432
+  env:
+    env_user_name: POSTGRES_USER
+    env_user_name_values: postgresadmin
+
+    env_user_password: POSTGRES_PASSWORD
+    env_user_password_values: a123
+
+    env_db_name: POSTGRES_DB
+    env_db_name_values: posttest
+
+    env_replication_user: REPLICATION_USER
+    env_replication_user_values: replicationuser
+
+    env_replication_password: REPLICATION_PASSWORD
+    env_replication_password_values: replicationPassword
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "128Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name: postgres-sf-pvc
+  volumeMounts_mountPath: /data
+    
+
+service:
+  service_name: postgre-sf-svc
+  port: 5432
+  target_port: 5432
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: postgres-sf-pvc
+  storage_class: db-data
+  access_modes: "ReadWriteOnce"
+  size: 1Gi
