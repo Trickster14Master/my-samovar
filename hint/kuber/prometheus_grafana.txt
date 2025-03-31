@@ -20,3 +20,8 @@ helm pull tricksterproxy/trickster
 tar xzf trickster-1.5.4.tgz
 cp trickster/values.yaml trickster-values.yaml
 helm upgrade --install --create-namespace --values trickster-values.yaml trickster -n monitoring tricksterproxy/trickster
+
+helm upgrade --install promtail grafana/promtail -f monitoring/promtail-values.yaml -n monitoring
+helm upgrade --install loki grafana/loki-distributed -n monitoring
+
+db sourc http://loki-loki-distributed-query-frontend.monitoring:3100
