@@ -1,0 +1,12 @@
+'pipeline {
+    agent any
+    stages {
+            stage("Test connect VM-test"){
+                steps{
+                    sshagent(['access-to-test']) {
+                        sh 'ssh -o StrictHostKeyChecking=no root@192.168.0.242 ip addr'; 
+                    }
+                }
+        }
+    }
+}

@@ -1,0 +1,79 @@
+pipeline {
+    agent {
+        kubernetes {
+            label 'kaniko'
+            yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+      - name: test-jenkins-docker
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: test-jenkins-docker
+    projected:
+      sources:
+      - secret:
+          name: test-jenkins-docker
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
+        }
+    }
+    stages {
+        stage('GIT CLONE PROJECT') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Trickster14Master/test-jenkins-ci-cd'
+            }
+        }
+        stage('BUILD') {
+            steps {
+                container(name: 'kaniko') {
+                    sh '''
+/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=trickstermaster/test-jenkins-ci-cd:$BUILD_ID
+                    '''
+                }
+            }
+        }
+        stage('GIT CLONE HELM') {
+            steps {
+                git branch: 'test-jenkins-ci-cd-helm', url: 'https://github.com/Trickster14Master/my-samovar-helm-charts'
+            }
+        }
+
+        stage('EDIT HELM') {
+            steps {
+                script{
+                    def text = readFile "TemplateDeploymentHelm/values.yaml"
+                    text = text.replaceAll("containers_image:.*", "containers_image: trickstermaster/test-jenkins-ci-cd:$BUILD_ID")
+                    writeFile file: "TemplateDeploymentHelm/values.yaml", text: text
+                    
+                    sh("cat TemplateDeploymentHelm/values.yaml")
+                }
+            }
+        }
+
+        stage('GIT PUSH') {
+            steps {
+                sh ('git config --global user.email "ne.stol.vagno.dlq.tebq@gmail.com"')
+                sh ('git config --global user.name "Trickster14Master"')
+                sh ("git add TemplateDeploymentHelm/values.yaml")
+                sh ("git commit -a -m 'build:$BUILD_ID' ")
+                
+                withCredentials([gitUsernamePassword(credentialsId: 'git-account-Trickster14Master-my-samovar-helm-charts', gitToolName: 'Default')]){
+                    sh ("git push -f origin test-jenkins-ci-cd-helm")
+                }
+            }
+        }
+        
+    }
+}
