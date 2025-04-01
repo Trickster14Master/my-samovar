@@ -1,0 +1,38 @@
+statefulset:
+  statefulset_name: mysql-stateful-set
+  app_label: mysql-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: mysql-container
+  containers_image: mysql:latest
+  port: 3306
+  env:
+    env_mysql_root_password: my_secret_password
+    env_mysql_database: app_db
+    env_mysql_user: db_user
+    env_mysql_password: db_user_pass
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "128Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name: mysql-sf-pvc
+  volumeMounts_mountPath: /var/lib/mysql
+    
+
+service:
+  service_name: mysql-sf-svc
+  port: 3306
+  target_port: 3306
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: mysql-sf-pvc
+  storage_class: db-data
+  access_modes: "ReadWriteOnce"
+  size: 1Gi
