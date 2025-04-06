@@ -1,0 +1,49 @@
+statefulset:
+  statefulset_name: mongodb-stateful-set
+  app_label: mongodb-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: mongodb-container
+  containers_image: mongo:4.4.6
+  port: 27017
+  env:
+    env_mongodb_root_username: admin
+    env_mongodb_root_password: password
+    env_mongodb_database: mydatabase
+
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "128Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name_init: mongodb-sf-pvc-init
+  volumeMounts_mountPath_init: /docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  volume_name_db: mongodb-sf-pvc-db
+  volumeMounts_mountPath_db: /data/db
+    
+
+service:
+  service_name: mongodb-sf-svc
+  port: 27017
+  target_port: 27017
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: mongodb-sf-pvc-init
+  storage_class: db-data
+  access_modes: "ReadWriteOnce"
+  size: 1Gi
+
+  volume_claim_name_db: mongodb-sf-pvc-db
+  storage_class_db: db-data
+  access_modes_db: "ReadWriteOnce"
+  size_db: 1Gi
+
+
+

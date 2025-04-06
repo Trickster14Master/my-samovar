@@ -1,0 +1,45 @@
+# работа с helm 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-jenkins-ci-cd-helm
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.test-alert: "-4758606215"
+    # notifications.argoproj.io/subscribe.sync-operation-change.discord: ""
+spec:
+  project: default
+  # блок с гит 
+  source:
+    repoURL: https://github.com/Trickster14Master/my-samovar-helm-charts.git
+    targetRevision: test-jenkins-ci-cd-helm
+    path: TemplateDeploymentHelm
+
+    helm:
+
+      # передаём параметры в виде файла лежащиго на гите 
+      valueFiles:
+      - values.yaml
+
+      # 
+      values: |
+        serviceAccount:
+          create: true
+          annotations:
+            demo/role: demo-annotation
+          name: sa-custom-name
+
+  # Destination cluster and namespace to deploy the application
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: test
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
