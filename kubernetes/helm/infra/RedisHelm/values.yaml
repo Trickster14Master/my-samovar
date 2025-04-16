@@ -1,48 +1,36 @@
 statefulset:
-  statefulset_name: postgre-stateful-set
-  app_label: postgre-app
-  replicas: 2
-  strategy-type: RollingUpdate
+  statefulset_name: redis-stateful-set
+  app_label: redis-app
+  replicas: 3
+  strategy_type: RollingUpdate
   affinity_key: works
   affinity_value: enable
 
 spec:
-  containers_name: postgre-container
-  containers_image: postgres:latest
-  port: 5432
-  env:
-    env_user_name: POSTGRES_USER
-    env_user_name_values: postgresadmin
+  containers_name: redis-container
+  containers_image: redis:5
+  port: 6379
 
-    env_user_password: POSTGRES_PASSWORD
-    env_user_password_values: a123
+  resources_requests_memory: "64Mi"
+  resources_requests_cpu: "250m"
+  resources_limits_memory: "128Mi"
+  resources_limits_cpu: "500m"
 
-    env_db_name: POSTGRES_DB
-    env_db_name_values: posttest
+  volume_reddis_data: redis-data
+  volume_reddis_data_mount: /data
 
-    env_replication_user: REPLICATION_USER
-    env_replication_user_values: replicationuser
-
-    env_replication_password: REPLICATION_PASSWORD
-    env_replication_password_values: replicationPassword
-
-  resources_requests-memory: "64Mi"
-  resources_requests-cpu: "250m"
-  resources_limits-memory: "128Mi"
-  resources_limits-cpu: "500m"
-
-  volume_name: postgres-sf-pvc
-  volumeMounts_mountPath: /data
+  volume_reddis_config: redis-config
+  volume_reddis_config_mount: /etc/redis
     
 
 service:
-  service_name: postgre-sf-svc
-  port: 5432
-  target_port: 5432
+  service_name: redis-sf-svc
+  port: 6379
+  target_port: 6379
   type: LoadBalancer
 
 volumeClaimTemplates:
-  volume_claim_name: postgres-sf-pvc
-  storage_class: db-data
+  volume_claim_name: redis-sf-pvc
+  storage_class: app-data
   access_modes: "ReadWriteOnce"
   size: 1Gi

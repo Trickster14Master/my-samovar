@@ -20,18 +20,15 @@ spec:
       containers:
         - name: {{ .Values.spec.containers_name }}
           image: {{ .Values.spec.containers_image }}
-          env:
-           - name: {{ .Values.spec.env.env_user_name }}
-             value: {{ .Values.spec.env.env_user_name_values }}
-           - name: {{ .Values.spec.env.env_user_password }}
-             value: {{ .Values.spec.env.env_user_password_values }}
-           - name: {{ .Values.spec.env.env_db_name }}
-             value: {{ .Values.spec.env.env_db_name_values }}
+          command: ["redis-server", "/etc/redis/redis.conf"]
           ports:
             - containerPort: {{ .Values.spec.port }}
           volumeMounts:
-            - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
-              name: {{ .Values.spec.volume_name }} 
+          - name:  {{ .Values.volumeClaimTemplates.volume_claim_name }}
+            mountPath: {{ .Values.spec.volume_reddis_data_mount }}
+
+          - name: {{ .Values.spec.volume_reddis_config }}
+            mountPath: {{ .Values.spec.volume_reddis_config_mount }}
           resources:
             requests:
               memory: {{ .Values.spec.resources_requests_memory }}
@@ -39,6 +36,10 @@ spec:
             limits:
               memory: {{ .Values.spec.resources_limits_memory }}
               cpu: {{ .Values.spec.resources_limits_cpu }}
+      volumes:
+      - name: {{ .Values.spec.volume_reddis_config }}
+        configMap:
+          name: {{ .Values.spec.volume_reddis_config }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -57,3 +58,5 @@ spec:
       resources:
         requests:
           storage: {{ .Values.volumeClaimTemplates.size }}
+
+
