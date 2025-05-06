@@ -1,9 +1,10 @@
+
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: db-data
-provisioner: driver.longhorn.io # указываем что нужно использовать ресурсы longhorn
+  name: app-test
+provisioner: kubernetes.io/aws-ebs # указываем что нужно использовать ресурсы longhorn
 allowVolumeExpansion: true # показываем что даный сторедж можно расширять 
 parameters:
   numberOfReplicas: "1" # указываем количество реплик 
@@ -12,4 +13,4 @@ parameters:
   replicaAutoBalance: "best-effort" # равномерное распределение реплик  https://longhorn.io/docs/1.3.2/high-availability/auto-balance-replicas/
   # dataLocality: "best-effort" # указываем так чтобы под обращался к реплике которая находиться на этойже ноде https://longhorn.io/docs/1.3.2/high-availability/data-locality/
   fromBackup: ""
-  nodeSelector: "db"
+  nodeSelector: "test"

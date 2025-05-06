@@ -1,0 +1,33 @@
+statefulset:
+  statefulset_name: jenkins-stateful-set
+  app_label: jenkins-app
+  replicas: 1
+  strategy-type: RollingUpdate 
+  affinity_key: jenkins
+  affinity_value: enable
+
+spec: 
+  containers_name: jenkins-container
+  containers_image: jenkins/jenkins:lts
+  port: 8080
+
+  resources_requests-memory: "2Gi"
+  resources_requests-cpu: "1000m"
+  resources_limits-memory: "500Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name: jenkins-sf-pvc
+  volumeMounts_mountPath: /var/jenkins_home
+    
+
+service:
+  service_name: jenkins-sf-svc
+  port: 8080
+  target_port: 8080
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: jenkins-sf-pvc 
+  storage_class: jenkins-data
+  access_modes: "ReadWriteOnce"
+  size: 8Gi

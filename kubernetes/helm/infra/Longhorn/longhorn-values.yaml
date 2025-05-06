@@ -373,9 +373,7 @@ longhornManager:
   #   value: "value"
   #   effect: "NoSchedule"
   # -- Node selector for Longhorn Manager. Specify the nodes allowed to run Longhorn Manager.
-  nodeSelector: {
-    
-  }
+  nodeSelector: {}
   ## If you want to set node selector for Longhorn Manager DaemonSet, delete the `{}` in the line above
   ## and uncomment this example block
   #  label-key1: "label-value1"
@@ -399,9 +397,7 @@ longhornDriver:
   #   value: "value"
   #   effect: "NoSchedule"
   # -- Node selector for Longhorn Driver. Specify the nodes allowed to run Longhorn Driver.
-  nodeSelector: {
-    # longhorn: "true"
-    }
+  nodeSelector: {}
   ## If you want to set node selector for Longhorn Driver Deployer Deployment, delete the `{}` in the line above
   ## and uncomment this example block
   #  label-key1: "label-value1"
@@ -421,9 +417,7 @@ longhornUI:
   #   value: "value"
   #   effect: "NoSchedule"
   # -- Node selector for Longhorn UI. Specify the nodes allowed to run Longhorn UI.
-  nodeSelector: {
-    # longhorn: "true"
-    }
+  nodeSelector: {}
   ## If you want to set node selector for Longhorn UI Deployment, delete the `{}` in the line above
   ## and uncomment this example block
   #  label-key1: "label-value1"
@@ -498,7 +492,7 @@ serviceAccount:
 metrics:
   serviceMonitor:
     # -- Setting that allows the creation of a Prometheus ServiceMonitor resource for Longhorn Manager components.
-    enabled: true
+    enabled: false
     # -- Additional labels for the Prometheus ServiceMonitor resource.
     additionalLabels: {}
     # -- Annotations for the Prometheus ServiceMonitor resource.

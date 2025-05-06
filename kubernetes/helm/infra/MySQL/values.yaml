@@ -3,7 +3,7 @@ statefulset:
   app_label: mysql-app
   replicas: 1
   strategy-type: RollingUpdate
-  affinity_key: works
+  affinity_key: jenkins
   affinity_value: enable
 
 spec:

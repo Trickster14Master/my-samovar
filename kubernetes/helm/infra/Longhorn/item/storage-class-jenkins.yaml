@@ -2,7 +2,7 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: db-data
+  name: jenkins-data
 provisioner: driver.longhorn.io # указываем что нужно использовать ресурсы longhorn
 allowVolumeExpansion: true # показываем что даный сторедж можно расширять 
 parameters:
@@ -12,4 +12,5 @@ parameters:
   replicaAutoBalance: "best-effort" # равномерное распределение реплик  https://longhorn.io/docs/1.3.2/high-availability/auto-balance-replicas/
   # dataLocality: "best-effort" # указываем так чтобы под обращался к реплике которая находиться на этойже ноде https://longhorn.io/docs/1.3.2/high-availability/data-locality/
   fromBackup: ""
-  nodeSelector: "db"
+  nodeSelector: "jenkins"
+

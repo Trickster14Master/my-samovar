@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: PersistentVolume 
+metadata:
+  name: test-nfs 
+  labels: 
+    type: local
+spec:
+  storageClassName: manual
+  capacity: 
+    storage: 15Gi
+  accessModes: 
+    - ReadWriteOnce
+  hostPath: 
+    path: "/home/user/nfs/jenkins"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: jenkins
+            operator: In
+            values:
+            - enable
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.statefulset.statefulset_name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.statefulset.app_label}}
+  replicas: {{ .Values.statefulset.replicas}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: {{ .Values.statefulset.strategy_type}} 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.statefulset.app_label}}
+    spec:
+      serviceAccountName: jenkins-account
+      containers:
+        - name: {{ .Values.spec.containers_name }}
+          image: {{ .Values.spec.containers_image }}
+          ports:
+            - containerPort: {{ .Values.spec.port }}
+          volumeMounts:
+            - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
+              name: {{ .Values.spec.volume_name }} 
+          resources:
+            requests:
+              memory: {{ .Values.spec.resources_requests_memory }}
+              cpu: {{ .Values.spec.resources_requests_cpu }}
+            limits:
+              memory: {{ .Values.spec.resources_limits_memory }}
+              cpu: {{ .Values.spec.resources_limits_cpu }}
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms2g -Xmx2g"
+            - name: JENKINS_ADMIN_ID
+              value: "admin"
+            - name: JENKINS_ADMIN_PASSWORD
+              value: "admin"
+          # command: ["/usr/local/bin/install-plugins.sh", "kubernetes"] 
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.statefulset.affinity_key }}
+                operator: In
+                values:
+                - {{ .Values.statefulset.affinity_value }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.volumeClaimTemplates.volume_claim_name }}
+    spec:
+      accessModes: [ {{ .Values.volumeClaimTemplates.access_modes }} ]
+      storageClassName: manual
+      volumeName: test-nfs
+      resources:
+        requests:
+          storage: {{ .Values.volumeClaimTemplates.size }}
