@@ -17,8 +17,7 @@ spec:
   resources_limits-cpu: "500m"
 
   volume_name: jenkins-sf-pvc
-  volumeMounts_mountPath: /var/jenkins_home
-    
+  volumeMounts_mountPath: /var/    
 
 service:
   service_name: jenkins-sf-svc

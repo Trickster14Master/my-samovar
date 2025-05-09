@@ -414,7 +414,7 @@ extraContainerVolumes: []
 persistence:
   type: pvc
   enabled: true
-  storageClassName: "app-data"
+  storageClassName: "monitoring-data"
   accessModes:
     - ReadWriteOnce
   size: 1Gi

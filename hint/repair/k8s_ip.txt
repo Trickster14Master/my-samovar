@@ -1,0 +1,8 @@
+при изменении ip на ноде нужно изменить ip в файлах 
+
+sudo vi /etc/kubernetes/admin.conf
+sudo vi /etc/kubernetes/kubelet.conf
+sudo vi /etc/kubernetes/controller-manager.conf
+sudo vi /etc/kubernetes/scheduler.conf
+nano    /etc/kubernetes/manifests/etcd.yaml
+

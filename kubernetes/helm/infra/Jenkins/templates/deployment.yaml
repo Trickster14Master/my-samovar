@@ -79,8 +79,7 @@ spec:
       name: {{ .Values.volumeClaimTemplates.volume_claim_name }}
     spec:
       accessModes: [ {{ .Values.volumeClaimTemplates.access_modes }} ]
-      storageClassName: manual
-      volumeName: test-nfs
+      storageClassName: {{ .Values.volumeClaimTemplates.storage_class }}
       resources:
         requests:
           storage: {{ .Values.volumeClaimTemplates.size }}
