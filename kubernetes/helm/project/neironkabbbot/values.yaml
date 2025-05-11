@@ -11,9 +11,9 @@ spec:
   containers_image: trickstermaster/neironkabbbot:latest
   port: 5432
   env:
-    BOT_TOKEN: 7574548147:AAHWRjyUunOJH-_jqMqKjNmlQgrUQxXyYNY
-    AI_TOKEN: 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
-    PROXY: http://w7JDhAvA:7L1XeCgd@172.120.63.39:63500
+    BOT_TOKEN: -
+    AI_TOKEN: -
+    PROXY: -
     DB_HOST: 192.168.0.156:8191
     DB_USER: USER
     DB_PASSWORD: PASSWORD
