@@ -6,8 +6,12 @@ metadata:
     app: {{ .Values.statefulset.app_label}}
 spec:
    ports:
-    - port: {{ .Values.service.port }}
+    - name: {{ .Values.service.service_name }}
+      port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.target_port }}
+    - name: {{ .Values.service.service_name_agent }}
+      port: {{ .Values.service.port_agent }}
+      targetPort: {{ .Values.service.target_port_agent }}
    type: {{ .Values.service.type }}
    selector:
     app: {{ .Values.statefulset.app_label}}

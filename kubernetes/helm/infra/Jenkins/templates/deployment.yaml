@@ -46,7 +46,10 @@ spec:
         - name: {{ .Values.spec.containers_name }}
           image: {{ .Values.spec.containers_image }}
           ports:
-            - containerPort: {{ .Values.spec.port }}
+            - name: http-port
+              containerPort: {{ .Values.spec.port }}
+            - name: jnlp-port
+              containerPort: {{ .Values.spec.port_agen }}         
           volumeMounts:
             - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
               name: {{ .Values.spec.volume_name }} 
@@ -60,10 +63,6 @@ spec:
           env:
             - name: JAVA_OPTS
               value: "-Xms2g -Xmx2g"
-            - name: JENKINS_ADMIN_ID
-              value: "admin"
-            - name: JENKINS_ADMIN_PASSWORD
-              value: "admin"
           # command: ["/usr/local/bin/install-plugins.sh", "kubernetes"] 
       affinity:
         nodeAffinity:
@@ -79,7 +78,8 @@ spec:
       name: {{ .Values.volumeClaimTemplates.volume_claim_name }}
     spec:
       accessModes: [ {{ .Values.volumeClaimTemplates.access_modes }} ]
-      storageClassName: {{ .Values.volumeClaimTemplates.storage_class }}
+      storageClassName: manual
+      volumeName: test-nfs
       resources:
         requests:
           storage: {{ .Values.volumeClaimTemplates.size }}

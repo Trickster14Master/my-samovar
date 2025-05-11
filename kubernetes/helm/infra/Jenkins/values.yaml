@@ -10,6 +10,7 @@ spec:
   containers_name: jenkins-container
   containers_image: jenkins/jenkins:lts
   port: 8080
+  port_agen: 8080
 
   resources_requests-memory: "2Gi"
   resources_requests-cpu: "1000m"
@@ -23,6 +24,10 @@ service:
   service_name: jenkins-sf-svc
   port: 8080
   target_port: 8080
+
+  service_name_agent: jenkins-agent-sf-svc
+  port_agent: 50000
+  target_port_agent: 50000
   type: LoadBalancer
 
 volumeClaimTemplates:
