@@ -1,0 +1,33 @@
+statefulset:
+  statefulset_name: sqlite-stateful-set
+  app_label: sqlite-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: sqlite-container
+  containers_image: hibitdev/sqlite:latest
+  port: 8191
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "128Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name: sqlite-sf-pvc
+  volumeMounts_mountPath: /db
+    
+
+service:
+  service_name: sqlite-sf-svc
+  port: 8191
+  target_port: 8191
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: sqlite-sf-pvc
+  storage_class: db-data
+  access_modes: "ReadWriteOnce"
+  size: 1Gi

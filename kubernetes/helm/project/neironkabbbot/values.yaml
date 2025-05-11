@@ -1,0 +1,40 @@
+statefulset:
+  statefulset_name: neironkabbbot-stateful-set
+  app_label: neironkabbbot-app
+  replicas: 1
+  strategy-type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: neironkabbbot-container
+  containers_image: trickstermaster/neironkabbbot:latest
+  port: 5432
+  env:
+    BOT_TOKEN: 7574548147:AAHWRjyUunOJH-_jqMqKjNmlQgrUQxXyYNY
+    AI_TOKEN: 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
+    PROXY: http://w7JDhAvA:7L1XeCgd@172.120.63.39:63500
+    DB_HOST: 192.168.0.156:8191
+    DB_USER: USER
+    DB_PASSWORD: PASSWORD
+
+  resources_requests-memory: "64Mi"
+  resources_requests-cpu: "250m"
+  resources_limits-memory: "128Mi"
+  resources_limits-cpu: "500m"
+
+  volume_name: neironkabbbot-sf-pvc
+  volumeMounts_mountPath: /app
+    
+
+service:
+  service_name: neironkabbbot-sf-svc
+  port: 5432
+  target_port: 5432
+  type: LoadBalancer
+
+volumeClaimTemplates:
+  volume_claim_name: neironkabbbot-sf-pvc
+  storage_class: app-data
+  access_modes: "ReadWriteOnce"
+  size: 1Gi
