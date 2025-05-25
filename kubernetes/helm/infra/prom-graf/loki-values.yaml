@@ -37,7 +37,7 @@ loki:
     httpGet:
       path: /ready
       port: http
-    initialDelaySeconds: 30
+    initialDelaySeconds: 3
     timeoutSeconds: 1
   livenessProbe:
     httpGet:
@@ -1942,7 +1942,7 @@ memcachedIndexQueries:
   priorityClassName: null
   # -- Labels for memcached-index-queries pods
   podLabels: {}
-  # -- Annotations for memcached-index-queries pods
+  # -- Annotations for memcached-index-queries pods 
   podAnnotations: {}
   # -- Labels for memcached-index-queries service
   serviceLabels: {}

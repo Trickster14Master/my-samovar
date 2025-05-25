@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: service-monitor-jenkins
+  namespace: monitoring  # или namespace, где установлен Prometheus
+spec:
+  endpoints:
+    - interval: 30s
+      path: /prometheus  # путь к метрикам Jenkins
+      port: jenkins-sf-svc  # должно совпадать с port в Service
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true  # если используется самоподписанный сертификат
+  selector:
+    matchLabels:
+      type: jenkins-app  # должно совпадать с labels Service
+  namespaceSelector:
+    matchNames:
+      - jenkins  # namespace, где работает Jenkins

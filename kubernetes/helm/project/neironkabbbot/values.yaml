@@ -1,5 +1,5 @@
-statefulset:
-  statefulset_name: neironkabbbot-stateful-set
+deployment:
+  deployment_name: neironkabbbot-deploy
   app_label: neironkabbbot-app
   replicas: 1
   strategy-type: RollingUpdate
@@ -8,33 +8,19 @@ statefulset:
 
 spec:
   containers_name: neironkabbbot-container
-  containers_image: trickstermaster/neironkabbbot:latest
-  port: 5432
+  containers_image: trickstermaster/neironkabbbot:3
+  port: 80
   env:
-    BOT_TOKEN: -
-    AI_TOKEN: -
-    PROXY: -
-    DB_HOST: 192.168.0.156:8191
-    DB_USER: USER
-    DB_PASSWORD: PASSWORD
+    ENV_BOT_TOKEN: [eq
+    ENV_AI_TOKEN: [eq
+    ENV_PROXY: [eq
 
   resources_requests-memory: "64Mi"
   resources_requests-cpu: "250m"
   resources_limits-memory: "128Mi"
-  resources_limits-cpu: "500m"
+  resources_limits-cpu: "500m" 
 
-  volume_name: neironkabbbot-sf-pvc
-  volumeMounts_mountPath: /app
     
 
-service:
-  service_name: neironkabbbot-sf-svc
-  port: 5432
-  target_port: 5432
-  type: LoadBalancer
 
-volumeClaimTemplates:
-  volume_claim_name: neironkabbbot-sf-pvc
-  storage_class: app-data
-  access_modes: "ReadWriteOnce"
-  size: 1Gi
+

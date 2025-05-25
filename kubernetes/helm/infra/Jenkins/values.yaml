@@ -10,7 +10,7 @@ spec:
   containers_name: jenkins-container
   containers_image: jenkins/jenkins:lts
   port: 8080
-  port_agen: 8080
+  port_agen: 50000
 
   resources_requests-memory: "2Gi"
   resources_requests-cpu: "1000m"

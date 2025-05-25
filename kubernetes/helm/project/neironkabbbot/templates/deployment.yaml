@@ -1,43 +1,36 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: {{ .Values.statefulset.statefulset_name}}
+  name: {{ .Values.deployment.deployment_name}}
 spec:
   selector:
     matchLabels:
-      app: {{ .Values.statefulset.app_label}}
-  replicas: {{ .Values.statefulset.replicas}}
+      app: {{ .Values.deployment.app_label}}
+  replicas: {{ .Values.deployment.replicas}}
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-    type: {{ .Values.statefulset.strategy_type}} 
+    type: {{ .Values.deployment.strategy_type}} 
   template:
     metadata:
       labels:
-        app: {{ .Values.statefulset.app_label}}
+        app: {{ .Values.deployment.app_label}}
     spec:
       containers:
         - name: {{ .Values.spec.containers_name }}
           image: {{ .Values.spec.containers_image }}
           env:
            - name: BOT_TOKEN
-             value: {{ .Values.spec.env.BOT_TOKEN }}
+             value: {{ .Values.spec.env.ENV_BOT_TOKEN }}
            - name: AI_TOKEN
-             value: {{ .Values.spec.env.AI_TOKEN }}
+             value: {{ .Values.spec.env.ENV_AI_TOKEN }}
            - name: PROXY
-             value: {{ .Values.spec.env.PROXY }}
-           - name: DB_HOST
-             value: {{ .Values.spec.env.DB_HOST }}
-           - name: DB_USER
-             value: {{ .Values.spec.env.DB_USER }}
-           - name: DB_PASSWORD
-             value: {{ .Values.spec.env.DB_PASSWORD }}
+             value: {{ .Values.spec.env.ENV_PROXY }}
+           - name: DATABASE
+             value: {{ .Values.spec.env.ENV_DATABASE }}
           ports:
-            - containerPort: {{ .Values.spec.port }}
-          volumeMounts:
-            - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
-              name: {{ .Values.spec.volume_name }} 
+            - containerPort: {{ .Values.spec.port }} 
           resources:
             requests:
               memory: {{ .Values.spec.resources_requests_memory }}
@@ -50,16 +43,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.statefulset.affinity_key }}
+              - key: {{ .Values.deployment.affinity_key}}
                 operator: In
                 values:
-                - {{ .Values.statefulset.affinity_value }}
-  volumeClaimTemplates:
-  - metadata:
-      name: {{ .Values.volumeClaimTemplates.volume_claim_name }}
-    spec:
-      accessModes: [ {{ .Values.volumeClaimTemplates.access_modes }} ]
-      storageClassName: {{ .Values.volumeClaimTemplates.storage_class }}
-      resources:
-        requests:
-          storage: {{ .Values.volumeClaimTemplates.size }}
+                - {{ .Values.deployment.affinity_value}}

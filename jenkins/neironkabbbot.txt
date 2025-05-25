@@ -1,0 +1,91 @@
+pipeline {
+    environment {
+        ENV_DATABASE = 'mysql+aiomysql://учётка:пароль@адрес mysql/neironkabbbot'
+        REPLICAS = 1
+    }
+
+    agent {
+        kubernetes {
+            label 'kaniko'
+            yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+      - name: test-jenkins-docker
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: test-jenkins-docker
+    projected:
+      sources:
+      - secret:
+          name: test-jenkins-docker
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
+        }
+    }
+    stages {
+        stage('GIT CLONE PROJECT') {
+            steps {
+                git branch: 'master', url: 'https://github.com/drplx777/neironkabbbot.git'
+            }
+        }
+        stage('BUILD') {
+            steps {
+                container(name: 'kaniko') {
+                    sh '''
+/kaniko/executor --dockerfile `pwd`/dockerfile --context `pwd` --destination=trickstermaster/neironkabbbot:$BUILD_ID
+                    '''
+                }
+            }
+        }
+        stage('GIT CLONE HELM') {
+            steps {
+                    git branch: 'neironkabbbot', credentialsId: 'git-account-Trickster14Master-my-samovar-helm-charts', url: 'https://github.com/Trickster14Master/my-samovar-helm-charts'
+            }
+        }
+
+        stage('EDIT HELM') {
+            steps {
+                script{
+                    def text = readFile "neironkabbbot/values.yaml"
+                    text = text.replaceAll("containers_image:.*", "containers_image: trickstermaster/neironkabbbot:$BUILD_ID")
+                    writeFile file: "neironkabbbot/values.yaml", text: text
+                    
+                    def db_env = readFile "neironkabbbot/values.yaml"
+                    db_env = db_env.replaceAll("ENV_DATABASE:.*", "ENV_DATABASE: $ENV_DATABASE")
+                    writeFile file: "neironkabbbot/values.yaml", text: db_env
+                    
+                    def replicas = readFile "neironkabbbot/values.yaml"
+                    replicas = replicas.replaceAll("replicas:.*", "replicas: $REPLICAS")
+                    writeFile file: "neironkabbbot/values.yaml", text: replicas
+                    
+                    sh("cat neironkabbbot/values.yaml")
+                }
+            }
+        }
+
+        stage('GIT PUSH') {
+            steps {
+                sh ('git config --global user.email "ne.stol.vagno.dlq.tebq@gmail.com"')
+                sh ('git config --global user.name "Trickster14Master"')
+                sh ("git add neironkabbbot/values.yaml")
+                sh ("git commit -a -m 'build:$BUILD_ID' ")
+                
+                withCredentials([gitUsernamePassword(credentialsId: 'git-account-Trickster14Master-my-samovar-helm-charts', gitToolName: 'Default')]){
+                    sh ("git push -f origin neironkabbbot")
+                }
+            }
+        }
+    }
+}
