@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.statefulset.statefulset_name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.statefulset.app_label}}
+  replicas: {{ .Values.statefulset.replicas}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: {{ .Values.statefulset.strategy_type}} 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.statefulset.app_label}}
+    spec:
+      containers:
+        - name: {{ .Values.spec.containers_name }}
+          image: {{ .Values.spec.containers_image }}
+          env:
+           - name: ALLOW_NONE_AUTHENTICATION
+             value: "yes"
+          ports:
+            - name: port-client
+              containerPort: {{ .Values.spec.port_client }}
+            - name: port-peer
+              containerPort: {{ .Values.spec.port_peer }}
+          volumeMounts:
+            - mountPath: {{ .Values.spec.volumeMounts_mountPath }}
+              name: {{ .Values.spec.volume_name }} 
+          resources:
+            requests:
+              memory: {{ .Values.spec.resources_requests_memory }}
+              cpu: {{ .Values.spec.resources_requests_cpu }}
+            limits:
+              memory: {{ .Values.spec.resources_limits_memory }}
+              cpu: {{ .Values.spec.resources_limits_cpu }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.statefulset.affinity_key }}
+                operator: In
+                values:
+                - {{ .Values.statefulset.affinity_value }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.volumeClaimTemplates.volume_claim_name }}
+    spec:
+      accessModes: [ {{ .Values.volumeClaimTemplates.access_modes }} ]
+      storageClassName: {{ .Values.volumeClaimTemplates.storage_class }}
+      resources:
+        requests:
+          storage: {{ .Values.volumeClaimTemplates.size }}

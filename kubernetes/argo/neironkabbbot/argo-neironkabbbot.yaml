@@ -1,0 +1,52 @@
+# работа с helm 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: neironkabbbot
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    notifications.argoproj.io/subscribe.on-health-degraded.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-created.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-deleted.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-deployed.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-sync-failed.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-sync-running.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-sync-status-unknown.test-alert: "-4758606215"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.test-alert: "-4758606215" 
+    # notifications.argoproj.io/subscribe.sync-operation-change.discord: ""
+spec:
+  project: default
+  # блок с гит 
+  source:
+    repoURL: https://github.com/Trickster14Master/my-samovar-helm-charts.git
+    targetRevision: neironkabbbot
+    path: neironkabbbot
+
+    helm:
+
+      # передаём параметры в виде файла лежащиго на гите 
+      valueFiles:
+      - values.yaml
+
+      # 
+      values: |
+        serviceAccount:
+          create: true
+          annotations:
+            demo/role: demo-annotation
+          name: sa-custom-name
+
+  # Destination cluster and namespace to deploy the application
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: neironkabbbot
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

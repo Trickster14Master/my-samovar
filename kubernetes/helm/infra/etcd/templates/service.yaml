@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.service_etcd_clietn }}
+  labels:
+    app: {{ .Values.statefulset.app_label}}
+spec:
+   ports:
+    - port: {{ .Values.service.port_client }}
+      targetPort: {{ .Values.service.target_port_client }}
+   type: {{ .Values.service.type_service_etcd_clietn }}
+   selector:
+    app: {{ .Values.statefulset.app_label}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.service_etcd_peer }}
+  labels:
+    app: {{ .Values.statefulset.app_label}}
+spec:
+   ports:
+    - name: etcd-client
+      port: {{ .Values.service.port_client }}
+      targetPort: {{ .Values.service.target_port_client }}
+    - name: etcd-peer
+      port: {{ .Values.service.port_peer }}
+      targetPort: {{ .Values.service.target_port_peer }}
+   type: {{ .Values.service.type_service_etcd_peer }}
+   selector:
+    app: {{ .Values.statefulset.app_label}}

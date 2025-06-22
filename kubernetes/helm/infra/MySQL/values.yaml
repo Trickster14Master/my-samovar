@@ -11,10 +11,10 @@ spec:
   containers_image: mysql:latest
   port: 3306
   env:
-    env_mysql_root_password: ac8-ApsQLw
+    env_mysql_root_password: password
     env_mysql_database: app_db
     env_mysql_user: user
-    env_mysql_password: ac8-ApsQLw
+    env_mysql_password: password
 
   resources_requests-memory: "64Mi"
   resources_requests-cpu: "250m"

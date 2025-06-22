@@ -1,0 +1,58 @@
+statefulset:
+  statefulset_name: etcd-stateful-set
+  app_label: etcd-app
+  replicas: 3
+  strategy_type: RollingUpdate
+  affinity_key: works
+  affinity_value: enable
+
+spec:
+  containers_name: etcd-container
+  containers_image: bitnami/etcd:latest
+  port_client: 2379
+  port_peer: 2380
+
+  resources_requests_memory: "64Mi"
+  resources_requests_cpu: "250m"
+  resources_limits_memory: "128Mi"
+  resources_limits_cpu: "500m"
+
+  volume_name: etcd-sf-pvc
+  volumeMounts_mountPath: /var/run/etcd
+
+  env: 
+    ALLOW_NONE_AUTHENTICATION: "yes"
+
+  command: '''
+    - /bin/sh
+    - -c
+    - |
+      PEERS="etcd-0=http://etcd-0.etcd:2380,etcd-1=http://etcd-1.etcd:2380,etcd-2=http://etcd-2.etcd:2380"
+      exec etcd --name ${HOSTNAME} \
+        --listen-peer-urls http://0.0.0.0:2380 \
+        --listen-client-urls http://0.0.0.0:2379 \
+        --advertise-client-urls http://${HOSTNAME}.etcd:2379 \
+        --initial-advertise-peer-urls http://${HOSTNAME}:2380 \
+        --initial-cluster-token etcd-cluster-1 \
+        --initial-cluster ${PEERS} \
+        --initial-cluster-state new \
+        --data-dir /var/run/etcd/default.etcd
+        '''
+    
+
+service:
+  service_etcd_clietn: etcd-client
+  port_client: 2379
+  target_port_client: 2379
+  type_service_etcd_clietn: LoadBalancer
+
+  service_etcd_peer: etcd-peer
+  port_peer: 2380
+  target_port_peer: 2380
+  type_service_etcd_peer: ClusterIP
+
+volumeClaimTemplates:
+  volume_claim_name: etcd-sf-pvc
+  storage_class: etcd-data
+  access_modes: "ReadWriteOnce"
+  size: 500Mi

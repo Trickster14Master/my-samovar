@@ -1,7 +1,7 @@
 statefulset:
   statefulset_name: postgre-stateful-set
   app_label: postgre-app
-  replicas: 2
+  replicas: 1
   strategy-type: RollingUpdate
   affinity_key: works
   affinity_value: enable
@@ -25,7 +25,7 @@ spec:
 
     env_replication_password: REPLICATION_PASSWORD
     env_replication_password_values: replicationPassword
-
+ 
   resources_requests-memory: "64Mi"
   resources_requests-cpu: "250m"
   resources_limits-memory: "128Mi"
@@ -39,7 +39,7 @@ service:
   service_name: postgre-sf-svc
   port: 5432
   target_port: 5432
-  type: LoadBalancer
+  type: ExternalName
 
 volumeClaimTemplates:
   volume_claim_name: postgres-sf-pvc
